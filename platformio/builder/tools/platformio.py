@@ -122,6 +122,25 @@ def BuildProgram(env):
     if (env.get("LDSCRIPT_PATH")
             and not any("-Wl,-T" in f for f in env['LINKFLAGS'])):
         env.Prepend(LINKFLAGS=["-T", "$LDSCRIPT_PATH"])
+    # or parse user-provided -Wl,-T... and prepend it before any other arguments
+    else:
+        flags = env["LINKFLAGS"]
+        filtered = []
+        ldscript = None
+
+        while len(flags):
+            flag = flags.pop(0)
+            if "-Wl,-T" in flag:
+                ldscript = flag.replace("-Wl,", "")
+                continue
+
+            filtered.append(flag)
+
+        filtered.insert(0, ldscript)
+        env.Replace(LINKFLAGS=filtered)
+
+    # TODO removeme
+    print(env["LINKFLAGS"])
 
     # enable "cyclic reference" for linker
     if env.get("LIBS") and env.GetCompilerType() == "gcc":
