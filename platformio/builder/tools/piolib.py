@@ -36,6 +36,7 @@ from platformio.builder.tools import platformio as piotool
 from platformio.compat import (WINDOWS, get_file_contents, hashlib_encode_data,
                                string_types)
 from platformio.managers.lib import LibraryManager
+from platformio.project.helpers import get_project_global_lib_dir
 
 
 class LibBuilderFactory(object):
@@ -855,12 +856,15 @@ class ProjectAsLibBuilder(LibBuilderBase):
                     return True
             return False
 
+        global_lm = LibraryManager(get_project_global_lib_dir())
         lm = LibraryManager(
             self.env.subst(join("$PROJECTLIBDEPS_DIR", "$PIOENV")))
+
         did_install = False
         for item in self.dependencies:
-            # check if built-in library or already installed
+            # check if built-in library or already installed in global or local storage
             if (_is_builtin(item)
+                    or global_lm.get_package_dir(*global_lm.parse_pkg_uri(item))
                     or lm.get_package_dir(*lm.parse_pkg_uri(item))):
                 continue
             try:
