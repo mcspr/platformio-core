@@ -185,7 +185,6 @@ def expanduser(path):
         return os.path.expanduser(path)
     return os.environ["USERPROFILE"] + path[1:]
 
-
 def rmtree(path):
     def _onerror(func, path, __):
         try:
@@ -201,3 +200,7 @@ def rmtree(path):
             )
 
     return shutil.rmtree(path, onerror=_onerror)
+
+def move(src, target):
+    shutil.copytree(src, target)
+    rmtree(src)
