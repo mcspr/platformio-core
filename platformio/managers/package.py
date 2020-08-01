@@ -20,6 +20,11 @@ import shutil
 from os.path import basename, getsize, isdir, isfile, islink, join, realpath
 from tempfile import mkdtemp
 
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+
 import click
 import requests
 import semantic_version
@@ -51,7 +56,16 @@ class PackageRepoIterator(object):
     @staticmethod
     @util.memoized(expire="60s")
     def load_manifest(url):
-        r = None
+        parsed = urlparse(url)
+        if not (parsed.scheme and parsed.netloc):
+            try:
+                with open(url, "r") as f:
+                    return json.load(f)
+            except Exception as e:
+                pass
+
+            return None
+
         try:
             r = requests.get(url, headers={"User-Agent": app.get_user_agent()})
             r.raise_for_status()
@@ -61,6 +75,7 @@ class PackageRepoIterator(object):
         finally:
             if r:
                 r.close()
+
         return None
 
     def next(self):

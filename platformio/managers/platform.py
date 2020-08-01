@@ -564,6 +564,7 @@ class PlatformBase(PlatformPackagesMixin, PlatformRunMixin):
         self._custom_packages = None
 
         self.config = ProjectConfig.get_instance()
+
         self.pm = PackageManager(
             self.config.get_optional_dir("packages"), self.package_repositories
         )
@@ -711,6 +712,11 @@ class PlatformBase(PlatformPackagesMixin, PlatformRunMixin):
     def configure_default_packages(self, options, targets):
         # override user custom packages
         self._custom_packages = options.get("platform_packages")
+
+        # also, add extra repo manifests (file or url)
+        repositories = options.get("platform_repositories")
+        repositories.extend(self.pm.repositories)
+        self.pm.repositories = repositories
 
         # enable used frameworks
         for framework in options.get("framework", []):

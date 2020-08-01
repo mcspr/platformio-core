@@ -284,6 +284,12 @@ ProjectOptions = OrderedDict(
                 description="Custom packages and specifications",
                 multiple=True,
             ),
+            ConfigEnvOption(
+                group="platform",
+                name="platform_repositories",
+                description="Custom platform repository manifest.json",
+                multiple=True,
+            ),
             # Board
             ConfigEnvOption(
                 group="platform",
