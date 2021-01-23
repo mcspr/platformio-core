@@ -141,6 +141,7 @@ class PlatformPackageManager(BasePackageManager):  # pylint: disable=too-many-an
         pm = ToolPackageManager()
         for pkg in pm.get_installed():
             skip_conds = [
+                pkg.metadata.spec.owner != "platformio",
                 pkg.metadata.name not in names,
                 pkg.metadata.spec.url,
                 pkg.metadata.name in required
